@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -140,13 +141,13 @@ namespace ExelTransferDataTest.Data
             newTable.Columns.Add("Position", typeof(string));
             newTable.Columns.Add("NameOfDitails", typeof(string));
             newTable.Columns.Add("X", typeof(int));
-            newTable.Columns.Add("X", typeof(int));
+            newTable.Columns.Add("Y", typeof(int));
             newTable.Columns.Add("Number", typeof(int));
             newTable.Columns.Add("Thikness", typeof(int));
             string sectionName = "C1";
             int curentNumberSection = 1;
             int newNumberSection = 0;
-            int numberOfRowWithNumberSection = 1; 
+            int numberOfRowWithNumberSection = 1;
 
             int rowNumbers = _ds.Tables[0].Rows.Count;
 
@@ -155,17 +156,17 @@ namespace ExelTransferDataTest.Data
                 if (!string.IsNullOrWhiteSpace(_ds.Tables[0].Rows[i - 1][0].ToString()))
                 {
                     numberOfRowWithNumberSection = i - 1;
-                    newNumberSection = Convert.ToInt32(_ds.Tables[0].Rows[i-1][0]);
+                    newNumberSection = Convert.ToInt32(_ds.Tables[0].Rows[i - 1][0]);
                     if (newNumberSection != curentNumberSection)
                     {
                         curentNumberSection = newNumberSection;
                         sectionName = "C" + newNumberSection;
                     }
                 }
-                if(thikness == _ds.Tables[0].Rows[i][4].ToString())
+                if (thikness == _ds.Tables[0].Rows[i][4].ToString())
                 {
                     _detailCount += 1;
-                    newTable.Rows.Add(sectionName, _detailCount, GetNameOfDetail(i, sectionName, numberOfRowWithNumberSection), GetX(i), GetY(i), GetNumber(i), thikness);
+                    newTable.Rows.Add(sectionName, _detailCount, GetNameOfDetail(i, sectionName, numberOfRowWithNumberSection), GetX(i), GetY(i), GetNumberOfDetails(i), thikness);
                 }
             }
             return null;
@@ -181,15 +182,21 @@ namespace ExelTransferDataTest.Data
 
         public int GetX(int rowNumber)
         {
-            return Convert.ToInt32(_ds.Tables[0].Rows[rowNumber][2].ToString());
+            string pattern = @"[\.\,]+[\d]{0,}";
+            Regex rgx = new Regex(pattern);
+            string x = rgx.Replace(_ds.Tables[0].Rows[rowNumber][2].ToString(), "");
+            return Convert.ToInt32(x);
         }
 
         public int GetY(int rowNumber)
         {
-            return Convert.ToInt32(_ds.Tables[0].Rows[rowNumber][3].ToString());
+            string pattern = @"[\.\,]+[\d]{0,}";
+            Regex rgx = new Regex(pattern);
+            string y = rgx.Replace(_ds.Tables[0].Rows[rowNumber][2].ToString(), "");
+            return Convert.ToInt32(y);
         }
 
-        public int GetNumber(int rowNumber)
+        public int GetNumberOfDetails(int rowNumber)
         {
             return Convert.ToInt32(_ds.Tables[0].Rows[rowNumber][5].ToString());
         }
@@ -199,6 +206,35 @@ namespace ExelTransferDataTest.Data
             string removeString;
             removeString = _ds.Tables[0].Rows[rowNumberWithNumberSection][1].ToString();
             return removeString;
+        }
+
+        public void CreateExcelFile(string sourcePath, string targetPath, string newFileName)
+        {
+            foreach (string existingFileName in Directory.GetFiles(sourcePath, "*.xlsx").Select(Path.GetFileName))
+            {
+                if (newFileName == existingFileName)
+                {
+                    throw new System.ArgumentException(string.Format("Файл в папке" + targetPath + " с именем " + newFileName + " уже существует!"));
+                }
+                else
+                {
+                    if (newFileName == null)
+                    {
+                        throw new ArgumentNullException("Не указано имя файла в которое будет скопированы данные!");
+                    }
+                    else
+                    {
+                        string tempFileName = "empty.xlsx";
+                        string sourceFile = System.IO.Path.Combine(sourcePath, tempFileName);
+                        string destFile = System.IO.Path.Combine(targetPath, newFileName);
+                        if (!System.IO.Directory.Exists(targetPath))
+                        {
+                            System.IO.Directory.CreateDirectory(targetPath);
+                        }
+                        System.IO.File.Copy(sourceFile, destFile, true);
+                    }
+                }
+            }
         }
     }
 }
