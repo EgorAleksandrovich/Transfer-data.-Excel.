@@ -11,32 +11,48 @@ namespace ExelTransferDataTest.Data
     public class Helpers
     {
         private DataSet _ds;
+        public DataSet Ds
+        { 
+            get
+            {
+                return _ds;
+            }
+            set
+            {
+                _ds = value;
+            }
+        }
         private int _detailCount;
 
-        private List<object> GetThicknessOfMaterials()
+        public Helpers()
         {
-            List<object> thicknessOfMaterials = new List<object>();
+
+        }
+
+        public List<string> GetThicknessOfMaterials()
+        {
+            List<string> thicknessOfMaterials = new List<string>();
             thicknessOfMaterials = GetValuesFromRows(4);
             thicknessOfMaterials = RemoveNullOrEmptyRow(thicknessOfMaterials);
             return thicknessOfMaterials;
         }
 
-        private List<object> GetNumberSections()
+        public List<string> GetNumberSections()
         {
-            List<object> numberSections = new List<object>();
+            List<string> numberSections = new List<string>();
             numberSections = GetValuesFromRows(0);
             numberSections = RemoveNullOrEmptyRow(numberSections);
             return numberSections;
         }
 
-        public List<object> GetValuesFromRows(int rowNumber)
+        public List<string> GetValuesFromRows(int rowNumber)
         {
-            return _ds.Tables[0].AsEnumerable().Select(r => r[rowNumber]).Distinct().ToList();
+            return _ds.Tables[0].AsEnumerable().Select(r => r[rowNumber].ToString()).Distinct().ToList();
         }
 
-        public static List<object> RemoveNullOrEmptyRow(List<object> list)
+        public static List<string> RemoveNullOrEmptyRow(List<string> list)
         {
-            foreach (Object o in list)
+            foreach (string o in list)
             {
                 if (string.IsNullOrWhiteSpace(o.ToString()))
                 {
@@ -69,7 +85,7 @@ namespace ExelTransferDataTest.Data
             int curentNumberSection = 1;
             int newNumberSection = 0;
             int numberOfRowWithNumberSection = 1;
-            int rowNumbers = _ds.Tables[0].Rows.Count;
+            int rowNumbers = _ds.Tables[0].Rows.Count-1;
 
             for (int i = 1; i <= rowNumbers; i++)
             {
@@ -89,7 +105,7 @@ namespace ExelTransferDataTest.Data
                     newTable.Rows.Add(sectionName, _detailCount, GetNameOfDetail(i, sectionName, numberOfRowWithNumberSection), GetX(i), GetY(i), GetNumberOfDetails(i), thikness);
                 }
             }
-            return null;
+            return newTable;
         }
 
         public string GetNameOfDetail(int rowNumber, string sectionName, int numberOfRowWithNumberSection)
@@ -113,7 +129,7 @@ namespace ExelTransferDataTest.Data
         {
             string pattern = @"[\.\,]+[\d]{0,}";
             Regex rgx = new Regex(pattern);
-            string y = rgx.Replace(_ds.Tables[0].Rows[rowNumber][2].ToString(), "");
+            string y = rgx.Replace(_ds.Tables[0].Rows[rowNumber][3].ToString(), "");
             return Convert.ToInt32(y);
         }
 

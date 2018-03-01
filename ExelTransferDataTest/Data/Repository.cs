@@ -12,9 +12,7 @@ namespace ExelTransferDataTest.Data
 {
     public class Repository
     {
-        private DataSet _ds;
-
-        private static string GetConnectionString(string file)
+        public string GetConnectionString(string file)
         {
             Dictionary<string, string> props = new Dictionary<string, string>();
 
@@ -25,35 +23,36 @@ namespace ExelTransferDataTest.Data
                 //Excel 2003 and Older
                 props["Provider"] = "Microsoft.Jet.OLEDB.4.0";
                 props["Extended Properties"] = "Excel 8.0";
+                //Excel 8.0;HDR=NO;IMEX=3;READONLY=FALSE\
             }
             else if (extension == "xlsx")
             {
                 //Excel 2007, 2010, 2012, 2013
                 props["Provider"] = "Microsoft.ACE.OLEDB.12.0";
-                props["Extended Properties"] = "Excel 12.0 XML";
+                props["Extended Properties"] = "Excel 12.0 Xml;";
+                //;Extended Properties=\"Excel 12.0 Xml; HDR=YES\";"
             }
             else
                 throw new Exception(string.Format("error file: {0}", file));
 
             props["Data Source"] = file;
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder connectionString = new StringBuilder();
 
             foreach (KeyValuePair<string, string> prop in props)
             {
-                sb.Append(prop.Key);
-                sb.Append('=');
-                sb.Append(prop.Value);
-                sb.Append(';');
+                connectionString.Append(prop.Key);
+                connectionString.Append('=');
+                connectionString.Append(prop.Value);
+                connectionString.Append(';');
             }
 
-            return sb.ToString();
+            return connectionString.ToString();
         }
 
-        private static DataSet GetDataSetFromExcelFile(string file)
+        public DataSet GetDataSetFromExcelFile(string file)
         {
             DataSet ds = new DataSet();
-
             string connectionString = GetConnectionString(file);
 
             using (OleDbConnection conn = new OleDbConnection(connectionString))
@@ -83,13 +82,11 @@ namespace ExelTransferDataTest.Data
                     da.Fill(dt);
 
                     ds.Tables.Add(dt);
-
                 }
-
                 cmd = null;
                 conn.Close();
+                return ds;
             }
-            return ds;
         }
 
         public void CreateExcelFile(string sourcePath, string targetPath, string newFileName)
