@@ -110,6 +110,7 @@ namespace ExelTransferDataTest.ViewModel
                 OnPropertyChanged("NewFileName");
             }
         }
+
         private void OpenFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
