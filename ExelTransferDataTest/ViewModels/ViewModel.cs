@@ -7,6 +7,8 @@ using System.Data.OleDb;
 using ExelTransferDataTest.Data;
 using System.Data;
 using System.IO;
+using Microsoft.Win32;
+using System.Windows;
 
 namespace ExelTransferDataTest.ViewModel
 {
@@ -110,10 +112,13 @@ namespace ExelTransferDataTest.ViewModel
         }
         private void OpenFile()
         {
-            SelectedFile = _ioService.OpenFileDialog(@"c:\Where\My\File\Usually\Is.txt");
-            if (SelectedFile == null)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = true;
+            openFileDialog.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (openFileDialog.ShowDialog() == true)
             {
-                SelectedFile = string.Empty;
+                SelectedFile = openFileDialog.FileName.ToString();
             }
         }
     }

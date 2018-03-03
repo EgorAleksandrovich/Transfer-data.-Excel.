@@ -108,7 +108,7 @@
     <Grid Grid.Column="0" Grid.Row="1">
         <StackPanel Background="LightGray">
             <TextBlock Text="Введите путь к файлу и его имя или воспользуйтесь кнопкой 'Найти'" FontFamily="Arial" Margin="10,10,10,0"></TextBlock>
-            <TextBox Text="{Binding OldFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="E:\data\excel\имяФайла.xlsx" Style="{StaticResource WatermarkedTextBox}" Margin="10,0,10,20"/>
+            <TextBox Text="{Binding SelectedFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="E:\data\excel\имяФайла.xlsx" Style="{StaticResource WatermarkedTextBox}" Margin="10,0,10,20"/>
         </StackPanel>
     </Grid>
     <Grid Grid.Column="1" Grid.Row="01">
