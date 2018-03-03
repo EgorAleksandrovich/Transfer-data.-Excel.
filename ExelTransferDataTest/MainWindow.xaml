@@ -1,0 +1,119 @@
+﻿<Window x:Class="ExelTransferDataTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:local="clr-namespace:ExelTransferDataTest"
+        xmlns:viewModels="clr-namespace:ExelTransferDataTest.ViewModel"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="E:\Development\Projects\Transfer data exel\ExelTransferDataTest\ExelTransferDataTest\Data\Data_Transfer.ico"
+        Title="Data Transfer" Height="100" Width="525" MinWidth="520" MinHeight="100">
+<Window.DataContext>
+    <viewModels:ViewModel/>
+</Window.DataContext>
+
+<Window.Resources>
+    <Style x:Key="WatermarkedTextBox" TargetType="{x:Type TextBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Grid>
+                        <Border Background="White" CornerRadius="4" BorderBrush="#FF7D8683" BorderThickness="1"/>
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        <Label Margin="5,0,0,0" x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}" VerticalAlignment="Center"
+                               Visibility="Collapsed" Foreground="Gray" FontFamily="Arial"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Text" Value=""/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Visibility" TargetName="WaterMarkLabel" Value="Visible"/>
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="DimGray"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="RoundCorner" TargetType="{x:Type Button}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid x:Name="grid">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="Black" BorderThickness="2">
+                            <Border.Background>
+                                <RadialGradientBrush GradientOrigin="0.496,1.052">
+                                    <RadialGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterX="0.5" CenterY="0.5" 
+                                                        ScaleX="1.5" ScaleY="1.5"/>
+                                            <TranslateTransform X="0.02" Y="0.3"/>
+                                        </TransformGroup>
+                                    </RadialGradientBrush.RelativeTransform>
+                                    <GradientStop Offset="1" Color="#00000000"/>
+                                    <GradientStop Offset="0.3" Color="#FFFFFFFF"/>
+                                </RadialGradientBrush>
+                            </Border.Background>
+                            <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.FontWeight="Bold">
+                            </ContentPresenter>
+                        </Border>
+
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" TargetName="border">
+                                <Setter.Value>
+                                    <RadialGradientBrush GradientOrigin="0.496,1.052">
+                                        <RadialGradientBrush.RelativeTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
+                                                <TranslateTransform X="0.02" Y="0.3"/>
+                                            </TransformGroup>
+                                        </RadialGradientBrush.RelativeTransform>
+                                        <GradientStop Color="#00000000" Offset="1"/>
+                                        <GradientStop Color="#FF303030" Offset="0.3"/>
+                                    </RadialGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="border" Value="#FF33962B"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" TargetName="grid" Value="0.25"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</Window.Resources>
+
+<Grid Background="LightGray">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="auto"></RowDefinition>
+        <RowDefinition Height="auto"></RowDefinition>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="80*"></ColumnDefinition>
+        <ColumnDefinition Width="20*"></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+    <Grid Grid.Column="0" Grid.Row="1">
+        <StackPanel Background="LightGray">
+            <TextBlock Text="Введите путь к файлу и его имя или воспользуйтесь кнопкой 'Найти'" FontFamily="Arial" Margin="10,10,10,0"></TextBlock>
+            <TextBox Text="{Binding OldFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="E:\data\excel\имяФайла.xlsx" Style="{StaticResource WatermarkedTextBox}" Margin="10,0,10,20"/>
+        </StackPanel>
+    </Grid>
+    <Grid Grid.Column="1" Grid.Row="01">
+            <Button Command="{Binding OpenCommand}" Content="Найти" Width="80" Height="auto" Margin="10,24,10,20" Style="{StaticResource RoundCorner}"></Button>
+    </Grid>
+</Grid>
+</Window>
+

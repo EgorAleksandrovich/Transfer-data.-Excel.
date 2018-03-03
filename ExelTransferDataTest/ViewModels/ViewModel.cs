@@ -1,44 +1,48 @@
-﻿using ExelTransferDataTest.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.OleDb;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Data.OleDb;
+using ExelTransferDataTest.Data;
+using System.Data;
+using System.IO;
 
-
-namespace Test
+namespace ExelTransferDataTest.ViewModel
 {
-    class Program
+    class ViewModel : ViewModelBase
     {
         static private Repository _repository;
-        static private DataSet _ds;
-        static private DataTable _dt;
         static private Helpers _helpers;
-        static private string _oldFile;
-        static private string _newFile;
-        static List<string> _thicknessOfMaterials;
-        static private int _count = 4;
-        static string _sql = null;
+        private string _selectedFile;
+        private string _newFile;
+        private DataSet _ds;
+        private DataTable _dt;
+        List<string> _thicknessOfMaterials;
+        private int _count = 4;
+        private IOService _ioService;
+        string _sql = null;
 
-
-        static void Main(string[] args)
+        public ViewModel()
         {
             _dt = new DataTable();
             _ds = new DataSet();
             _repository = new Repository();
             _helpers = new Helpers();
-            _oldFile = @"E:\Development\Projects\Transfer data exel\1.xlsx";
-            _newFile = @"E:\Development\Projects\Transfer data exel\empty.xlsx";
+            TransferCommand = new RelayCommand(TransferData);
 
-            //Path to location file after instaling application
-            //string path = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
+            OpenCommand = new RelayCommand(OpenFile);
+        }
 
-            _ds = _repository.GetDataSetFromExcelFile(_oldFile);
+        public ViewModel(IOService ioService)
+        {
+            _ioService = ioService;
+        }
+
+        public void TransferData()
+        {
+            string path = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
+            _ds = _repository.GetDataSetFromExcelFile(_selectedFile);
             _helpers.Ds = _ds;
             _thicknessOfMaterials = _helpers.GetThicknessOfMaterials();
             System.Data.OleDb.OleDbCommand myCommand = new System.Data.OleDb.OleDbCommand();
@@ -74,6 +78,43 @@ namespace Test
                 _count += 2;
             }
             MyConnection.Close();
+        }
+
+        public RelayCommand TransferCommand { get; set; }
+        public RelayCommand OpenCommand { get; set; }
+
+        public string SelectedFile
+        {
+            get
+            {
+                return _selectedFile;
+            }
+            set
+            {
+                _selectedFile = value;
+                OnPropertyChanged("SelectedFile");
+            }
+        }
+
+        public string NewFileName
+        {
+            get
+            {
+                return _newFile;
+            }
+            set
+            {
+                _newFile = value;
+                OnPropertyChanged("NewFileName");
+            }
+        }
+        private void OpenFile()
+        {
+            SelectedFile = _ioService.OpenFileDialog(@"c:\Where\My\File\Usually\Is.txt");
+            if (SelectedFile == null)
+            {
+                SelectedFile = string.Empty;
+            }
         }
     }
 }
