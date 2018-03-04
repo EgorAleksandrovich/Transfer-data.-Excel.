@@ -23,8 +23,9 @@ namespace ExelTransferDataTest.ViewModel
         List<string> _thicknessOfMaterials;
         private int _count = 4;
         private IOService _ioService;
-        string _sql = null;
-        string _emptyFile = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
+        private string _sql = null;
+        private string _emptyFile = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
+        private int _numberOfDetail = 1;
 
         public ViewModel()
         {
@@ -46,7 +47,7 @@ namespace ExelTransferDataTest.ViewModel
             _helpers.Ds = _repository.GetDataSetFromExcelFile(_selectedFile);
             _thicknessOfMaterials = _helpers.GetThicknessOfMaterials();
             _newFile = _repository.CreateExcelFile(_emptyFile, Path.GetDirectoryName(_selectedFile), _newFileName);
-            if(_newFile == null)
+            if (_newFile == null)
             {
                 return;
             }
@@ -77,6 +78,7 @@ namespace ExelTransferDataTest.ViewModel
                     myCommand.Parameters.Add(new OleDbParameter("@number", dr["Number"].ToString()));
                     myCommand.ExecuteNonQuery();
                     myCommand.Parameters.Clear();
+                    _numberOfDetail++;
                     _count++;
                 }
                 _count += 2;
