@@ -71,7 +71,7 @@ namespace ExelTransferDataTest.ViewModel
                     _sql = "insert into [Распил$A:J" + _count + "]  values (@sectionNumber, @numberOfDetail, @nameOfDitails, '', '', '', '', @x, @y, @number)";
                     myCommand.CommandText = _sql;
                     myCommand.Parameters.Add(new OleDbParameter("@sectionNumber", dr["SectionNumber"].ToString()));
-                    myCommand.Parameters.Add(new OleDbParameter("@numberOfDetail", _count.ToString()));
+                    myCommand.Parameters.Add(new OleDbParameter("@numberOfDetail", _numberOfDetail.ToString()));
                     myCommand.Parameters.Add(new OleDbParameter("@nameOfDitails", dr["NameOfDitails"].ToString()));
                     myCommand.Parameters.Add(new OleDbParameter("@x", dr["X"].ToString()));
                     myCommand.Parameters.Add(new OleDbParameter("@y", dr["Y"].ToString()));
