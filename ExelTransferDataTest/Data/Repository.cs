@@ -7,11 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ExelTransferDataTest.Data
 {
     public class Repository
     {
+        private string _targetFile;
+
         public string GetConnectionString(string file)
         {
             Dictionary<string, string> props = new Dictionary<string, string>();
@@ -33,7 +36,10 @@ namespace ExelTransferDataTest.Data
                 //;Extended Properties=\"Excel 12.0 Xml; HDR=YES\";"
             }
             else
-                throw new Exception(string.Format("error file: {0}", file));
+            {
+                MessageBox.Show(string.Format("Файл не найден: {0}", file));
+                return null;
+            }
 
             props["Data Source"] = file;
 
@@ -46,7 +52,6 @@ namespace ExelTransferDataTest.Data
                 connectionString.Append(prop.Value);
                 connectionString.Append(';');
             }
-
             return connectionString.ToString();
         }
 
@@ -89,33 +94,45 @@ namespace ExelTransferDataTest.Data
             }
         }
 
-        public void CreateExcelFile(string sourcePath, string targetPath, string newFileName)
+        public string CreateExcelFile(string sourceFile, string targetFilePath, string newFileName)
         {
-            foreach (string existingFileName in Directory.GetFiles(sourcePath, "*.xlsx").Select(Path.GetFileName))
+            if (newFileName == null)
             {
-                if (newFileName == existingFileName)
+                MessageBox.Show("Не указано имя файла в которое будет скопированы данные!");
+                return null;
+            }
+            else
+            {
+                newFileName += ".xlsx";
+
+                if (MatchFailNamesInFolder(targetFilePath, newFileName))
                 {
-                    throw new System.ArgumentException(string.Format("Файл в папке" + targetPath + " с именем " + newFileName + " уже существует!"));
+                    MessageBox.Show(string.Format("Файл в папке \"" + targetFilePath + "\" с именем \"" + newFileName + "\" уже существует! Введине другое имя!"));
+                    return null;
                 }
                 else
                 {
-                    if (newFileName == null)
+                    _targetFile = System.IO.Path.Combine(targetFilePath, newFileName);
+                    if (!System.IO.Directory.Exists(targetFilePath))
                     {
-                        throw new ArgumentNullException("Не указано имя файла в которое будет скопированы данные!");
+                        System.IO.Directory.CreateDirectory(targetFilePath);
                     }
-                    else
-                    {
-                        string tempFileName = "empty.xlsx";
-                        string sourceFile = System.IO.Path.Combine(sourcePath, tempFileName);
-                        string destFile = System.IO.Path.Combine(targetPath, newFileName);
-                        if (!System.IO.Directory.Exists(targetPath))
-                        {
-                            System.IO.Directory.CreateDirectory(targetPath);
-                        }
-                        System.IO.File.Copy(sourceFile, destFile, true);
-                    }
+                    System.IO.File.Copy(sourceFile, _targetFile, true);
                 }
             }
+            return _targetFile;
+        }
+
+        public bool MatchFailNamesInFolder(string targetPathFolder, string targetFileName)
+        {
+            foreach (string existingFileName in Directory.GetFiles(targetPathFolder, "*.xlsx").Select(Path.GetFileName))
+            {
+                if (existingFileName == targetFileName)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

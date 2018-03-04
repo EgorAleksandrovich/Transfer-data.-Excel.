@@ -4,7 +4,7 @@
         xmlns:viewModels="clr-namespace:ExelTransferDataTest.ViewModel"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Icon="E:\Development\Projects\Transfer data exel\ExelTransferDataTest\ExelTransferDataTest\Data\Data_Transfer.ico"
-        Title="Data Transfer" Height="130" Width="525" MinWidth="520" MinHeight="130" MaxHeight="140">
+        Title="Data Transfer" Height="150" Width="525" MinWidth="520" MinHeight="150" MaxHeight="150">
     <Window.DataContext>
         <viewModels:ViewModel/>
     </Window.DataContext>
@@ -114,8 +114,16 @@
         <Grid Grid.Column="1" Grid.Row="1" Background="LightGray">
             <Button Command="{Binding OpenCommand}" Content="Найти" Width="80" Height="auto" Margin="10,24,10,10" Style="{StaticResource RoundCorner}"/>
         </Grid>
-        <Grid Grid.Row="2" Grid.ColumnSpan="2">
-            <Button Command="{Binding TransferCommand}" Content="Пуск" Width="80" Height="22" HorizontalAlignment="Center" Margin="10" VerticalAlignment="Center" Style="{StaticResource RoundCornerGreen}"/>
+        <Grid Grid.Row="2" Grid.Column="0" Background="LightGreen">
+            <StackPanel>
+                <TextBlock Text="Введите имя файла в которое будет скопированы данные." FontFamily="Arial" Margin="10,10,10,0"></TextBlock>
+                <TextBox Text="{Binding NewFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="Введите имя файла" Style="{StaticResource WatermarkedTextBox}" Margin="10,0,10,10"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="1" Background="LightGreen">
+            <StackPanel>
+                <Button Command="{Binding TransferCommand}" Content="Пуск" Width="80" Height="22" HorizontalAlignment="Center" Margin="10,25,10,10" VerticalAlignment="Center" Style="{StaticResource RoundCornerGreen}"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

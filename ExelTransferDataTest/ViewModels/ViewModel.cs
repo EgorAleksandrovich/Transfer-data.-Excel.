@@ -17,22 +17,22 @@ namespace ExelTransferDataTest.ViewModel
         static private Repository _repository;
         static private Helpers _helpers;
         private string _selectedFile;
+        private string _newFileName;
         private string _newFile;
-        private DataSet _ds;
         private DataTable _dt;
         List<string> _thicknessOfMaterials;
         private int _count = 4;
         private IOService _ioService;
         string _sql = null;
+        string _emptyFile = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
 
         public ViewModel()
         {
             _dt = new DataTable();
-            _ds = new DataSet();
             _repository = new Repository();
             _helpers = new Helpers();
-            TransferCommand = new RelayCommand(TransferData);
 
+            TransferCommand = new RelayCommand(TransferData);
             OpenCommand = new RelayCommand(OpenFile);
         }
 
@@ -43,10 +43,13 @@ namespace ExelTransferDataTest.ViewModel
 
         public void TransferData()
         {
-            string path = Path.Combine(Environment.CurrentDirectory, @"Data\empty.xlsx");
-            _ds = _repository.GetDataSetFromExcelFile(_selectedFile);
-            _helpers.Ds = _ds;
+            _helpers.Ds = _repository.GetDataSetFromExcelFile(_selectedFile);
             _thicknessOfMaterials = _helpers.GetThicknessOfMaterials();
+            _newFile = _repository.CreateExcelFile(_emptyFile, Path.GetDirectoryName(_selectedFile), _newFileName);
+            if(_newFile == null)
+            {
+                return;
+            }
             System.Data.OleDb.OleDbCommand myCommand = new System.Data.OleDb.OleDbCommand();
             OleDbConnection MyConnection = new OleDbConnection(_repository.GetConnectionString(_newFile));
             MyConnection.Open();
@@ -55,7 +58,6 @@ namespace ExelTransferDataTest.ViewModel
             foreach (string thkness in _thicknessOfMaterials)
             {
                 _dt = _helpers.GetAllPartWithThikness(thkness);
-
                 myCommand.Parameters.Add(new OleDbParameter("@thikness", string.Format("Материал с толщиной {0}мм", thkness.ToString())));
                 _sql = "insert into [Распил$C:C" + _count + "]  values (@thikness)";
                 myCommand.CommandText = _sql;
@@ -80,6 +82,8 @@ namespace ExelTransferDataTest.ViewModel
                 _count += 2;
             }
             MyConnection.Close();
+
+            MessageBox.Show("!! Перенос данных завершен !!");
         }
 
         public RelayCommand TransferCommand { get; set; }
@@ -102,11 +106,11 @@ namespace ExelTransferDataTest.ViewModel
         {
             get
             {
-                return _newFile;
+                return _newFileName;
             }
             set
             {
-                _newFile = value;
+                _newFileName = value;
                 OnPropertyChanged("NewFileName");
             }
         }
@@ -121,6 +125,7 @@ namespace ExelTransferDataTest.ViewModel
             {
                 SelectedFile = openFileDialog.FileName.ToString();
             }
+            MessageBox.Show("    Перед нажатием кнопки \"Пуск\" убедитесь в том что указанный файл явлется тем самым файлом из которого нужно скопировать данные. В противном случае сгенерированный файл будет содержать не коркектные данные.");
         }
     }
 }
